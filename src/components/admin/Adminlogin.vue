@@ -18,8 +18,10 @@ function handleLogin() {
   try{
     await authStore.login(form.email, form.password)
     router.push({name:'admin.dashboard'})
-  }catch{
-    
+  }catch(err){
+    error.value = err.response?.data?.message || 'Invalid email or password' 
+  }finally{
+    isLoading.value = false
   }
 }
 </script>
@@ -52,11 +54,11 @@ function handleLogin() {
           </label>
           <input
             id="username"
-            v-model="form.username"
+            v-model="form.email"
             type="text"
-            placeholder="admin"
+            placeholder="admin@example.com"
             required
-            autocomplete="username"
+            autocomplete="email"
             class="w-full bg-black border border-white/20 p-4 text-white placeholder-gray-600 focus:border-neon-green focus:outline-none transition-colors"
           />
         </div>
