@@ -11,7 +11,7 @@ const form = reactive({ email: '', password: '' })
 const error = ref('')
 const isLoading = ref(false)
 
-function handleLogin() {
+async function handleLogin() {
   error.value = ''
   isLoading.value = true
 
