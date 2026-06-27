@@ -16,6 +16,7 @@ import AdminPricing from '../components/admin/AdminPricing.vue'
 import AdminBlog from '../components/admin/AdminBlog.vue'
 import AdminMessages from '../components/admin/AdminMessages.vue'
 import AdminSettings from '../components/admin/AdminSettings.vue'
+import { useAuthStore } from '../stores/auth.js'
 
 const routes = [
     // ── Frontend ──────────────────────────────────────────────
@@ -59,6 +60,28 @@ const routes = [
 const router = createRouter({
     history:createWebHistory(),
     routes:routes
+})
+
+router.beforeEach(async (to,from,next) => {
+    const authStore = useAuthStore();
+
+    if(!authStore.isAuth && sessionStorage.getItem('admin_auth') !== 'false')
+    {
+        await authStore.fetchUser();
+    }
+
+    if(to.meta.requiresAuth && !authStore.isAuth)
+    {
+        next({name:'admin.login'})
+    }
+    else if(to.meta.guestOnly && authStore.isAuth)
+    {
+        next({name:'admin.dashboard'});
+    }
+    else
+    {
+        next();
+    }
 })
 
 export default router

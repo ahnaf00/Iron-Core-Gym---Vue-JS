@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth',{
     state: () => ({
         user: null,
         isAuth:true,
+        isAuthAttempted:false
     }),
     actions:{
         async login(email,password){
@@ -24,6 +25,8 @@ export const useAuthStore = defineStore('auth',{
             }catch(error){
                 this.user = null;
                 this.isAuth = false
+            }finally{
+                this.isAuthAttempted = false
             }
         },
         async logout(){
