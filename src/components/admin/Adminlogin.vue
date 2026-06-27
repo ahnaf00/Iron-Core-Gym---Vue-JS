@@ -2,24 +2,24 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../../stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 
-const form = reactive({ username: '', password: '' })
+const form = reactive({ email: '', password: '' })
 const error = ref('')
 const isLoading = ref(false)
 
 function handleLogin() {
   error.value = ''
+  isLoading.value = true
 
-  // TODO: replace with real API call
-  // Hardcoded demo credentials: admin / admin123
-  if (form.username === 'admin' && form.password === 'admin123') {
-    isLoading.value = true
-    sessionStorage.setItem('admin_auth', 'true')
-    router.push({ name: 'admin.dashboard' })
-  } else {
-    error.value = 'Invalid username or password.'
+  try{
+    await authStore.login(form.email, form.password)
+    router.push({name:'admin.dashboard'})
+  }catch{
+    
   }
 }
 </script>

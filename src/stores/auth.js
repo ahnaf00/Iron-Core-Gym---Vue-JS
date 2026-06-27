@@ -21,7 +21,7 @@ export const useAuthStore = defineStore('auth',{
                 const response  = await api.get('/auth/me');
                 this.user = response.data;
                 this.isAuth = true
-            }catch{
+            }catch(error){
                 this.user = null;
                 this.isAuth = false
             }
