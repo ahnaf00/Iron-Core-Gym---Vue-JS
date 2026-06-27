@@ -1,14 +1,16 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '../../../stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 // Derive page title from route meta, fallback to route name
 const pageTitle = () => route.meta?.title ?? route.name?.replace('admin.', '') ?? 'Admin'
 
-function logout() {
-    sessionStorage.removeItem('admin_auth')
+async function logout() {
+    await authStore.logout()
     router.push({ name: 'admin.login' })
 }
 </script>
