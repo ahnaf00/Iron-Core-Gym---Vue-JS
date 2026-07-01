@@ -27,11 +27,10 @@ const props = defineProps({
                 displayPrice }}</span>
             <span class="text-gray-500 price-period">/ {{ isYearly ? 'Yearly' : 'Month' }}</span>
         </div>
-        <ul class="space-y-4 mb-8 flex-grow text-gray-300 text-sm font-medium">
+        <ul class="space-y-4 mb-8 flex-grow text-gray-300 text-sm">
             <li v-for="feature in plan.features" :key="feature.id" class="flex items-center gap-3"
                 :class="{ 'opacity-50': !feature.included }">
-                <i :class="feature.included ? 'fa-solid fa-check text-neon-green' : 'fa-solid fa-xmark'">{{ feature.label
-                    }}</i>
+                <i :class="feature.included ? 'fa-solid fa-check text-neon-green' : 'fa-solid fa-xmark'"></i>{{ feature.label }}
             </li>
 
         </ul>

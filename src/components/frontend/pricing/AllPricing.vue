@@ -1,63 +1,35 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import PricingCard from './PricingCard.vue'
+import api from '../../../axios.js'
 
 const isYearly = ref(false)
 
-const plans = ref([
-  {
-    id: 1,
-    name: 'Beginner',
-    description: 'Perfect for starters looking to get fit.',
-    monthlyPrice: 29,
-    yearlyPrice: 279,
-    featured: false,
-    features: [
-      { id: 1, label: '06:00 - 22:00 Access',  included: true  },
-      { id: 2, label: 'Standard Equipment',     included: true  },
-      { id: 3, label: 'Locker Room Access',     included: true  },
-      { id: 4, label: 'Personal Trainer',       included: false },
-      { id: 5, label: 'Nutrition Guide',        included: false },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Pro Athlete',
-    description: 'For dedicated gym goers.',
-    monthlyPrice: 49,
-    yearlyPrice: 469,
-    featured: true,
-    features: [
-      { id: 1, label: '24/7 Gym Access',        included: true  },
-      { id: 2, label: 'All Equipment',          included: true  },
-      { id: 3, label: 'Free Group Classes',     included: true  },
-      { id: 4, label: '1 Personal Session/mo',  included: true  },
-      { id: 5, label: 'Nutrition Guide',        included: false },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Elite',
-    description: 'Maximum performance package.',
-    monthlyPrice: 89,
-    yearlyPrice: 859,
-    featured: false,
-    features: [
-      { id: 1, label: '24/7 VIP Access',        included: true },
-      { id: 2, label: 'All Equipment + Sauna',  included: true },
-      { id: 3, label: 'Unlimited Classes',      included: true },
-      { id: 4, label: '4 Personal Sessions/mo', included: true },
-      { id: 5, label: 'Full Nutrition Guide',   included: true },
-    ],
-  },
-])
+const plans = ref([])
+
+onMounted(async () => {
+  try{
+    const response = await api.get('/pricing')
+    plans.value = response.data.data.map(p => ({
+      id: p.id,
+      name:p.name,
+      description: "get started with our premium package",
+      monthlyPrice: parseFloat(p.price),
+      yearlyPrice: parseFloat(p.price)*12*0.8,
+      featured: p.is_popular,
+      features: p.features.map((f,i) => ({id:i,label:f,included:true}))
+    }));
+  }
+  catch(error){
+    console.error("failed to load pricing: ",error)
+  }
+})
 
 // Derive each plan's display price from the toggle state
 const displayPrices = computed(() =>
   Object.fromEntries(
     plans.value.map((plan) => [
-      plan.id,
-      isYearly.value ? plan.yearlyPrice : plan.monthlyPrice,
+      plan.id, isYearly.value ? plan.yearlyPrice : plan.monthlyPrice,
     ])
   )
 )
