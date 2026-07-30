@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import ContactInfoCard from './ContactInfoCard.vue'
+import api from '../../../axios.js'
 
 // ── Info cards ────────────────────────────────────────────────
 const infoCards = ref([
@@ -32,7 +33,6 @@ const infoCards = ref([
   },
 ])
 
-// ── Contact form ──────────────────────────────────────────────
 const form = reactive({
   name:    '',
   email:   '',
@@ -43,14 +43,20 @@ const form = reactive({
 // Submission state: 'idle' | 'success' | 'error'
 const submitStatus = ref('idle')
 
-function handleSubmit() {
+async function handleSubmit() {
   // Basic guard — all fields required
-  if (!form.name || !form.email || !form.subject || !form.message) return
-
-  submitStatus.value = 'success'
-
-  // Reset form
-  Object.assign(form, { name: '', email: '', subject: '', message: '' })
+    if (!form.name || !form.email || !form.subject || !form.message) return
+    try{
+        await api.post('/contact',form)
+        
+        submitStatus.value = 'success'
+        // Reset form
+        Object.assign(form, { name: '', email: '', subject: '', message: '' })
+    }catch(err)
+    {
+        console.error(err)
+        submitStatus.value = "error"
+    }
 }
 </script>
 
