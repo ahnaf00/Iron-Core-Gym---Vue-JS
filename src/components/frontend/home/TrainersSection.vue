@@ -1,50 +1,33 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import TrainerCard from '../../ui/TrainerCard.vue';
+import api from '../../../axios.js';
 
-const trainers = ref([
+const trainers = ref([])
+const isLoading = ref(true)
+
+onMounted(async () => {
+  try{  
+    const response = await api.get('/trainers')
+    trainers.value = response.data.data.slice(0,4).map(t => ({
+      id:t.id,
+      name:t.name,
+      role:t.speciality,
+      image:t.photo_url || 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?q=80&w=1887&auto=format&fit=crop',
+      socilas: [
+        { id: 1, icon: 'fa-brands fa-facebook-f', href: '#' },
+        { id: 2, icon: 'fa-brands fa-instagram', href: '#' },
+        { id: 3, icon: 'fa-brands fa-twitter', href: '#' },
+      ]
+    }))
+  }catch(err)
   {
-    id: 1,
-    name: 'John Doe',
-    role: 'CrossFit Expert',
-    image: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?q=80&w=1887&auto=format&fit=crop',
-    socials: [
-      { id: 1, icon: 'fa-brands fa-facebook-f', href: '#' },
-      { id: 2, icon: 'fa-brands fa-instagram',  href: '#' },
-      { id: 3, icon: 'fa-brands fa-twitter',    href: '#' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    role: 'Yoga Instructor',
-    image: 'https://images.unsplash.com/photo-1611672585731-fa10603fb9e0?q=80&w=1887&auto=format&fit=crop',
-    socials: [
-      { id: 1, icon: 'fa-brands fa-facebook-f', href: '#' },
-      { id: 2, icon: 'fa-brands fa-instagram',  href: '#' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Mike Tyson',
-    role: 'Boxing Coach',
-    image: 'https://images.unsplash.com/photo-1597452485669-2c7bb5fef90d?q=80&w=1887&auto=format&fit=crop',
-    socials: [
-      { id: 1, icon: 'fa-brands fa-facebook-f', href: '#' },
-      { id: 2, icon: 'fa-brands fa-instagram',  href: '#' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Sarah Connor',
-    role: 'Cardio Specialist',
-    image: 'https://images.unsplash.com/photo-1548690312-e3b507d8c110?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    socials: [
-      { id: 1, icon: 'fa-brands fa-facebook-f', href: '#' },
-      { id: 2, icon: 'fa-brands fa-instagram',  href: '#' },
-    ],
-  },
-])
+    console.error("Failed to load homepage trainers, ",err)
+  }
+  finally{
+    isLoading.value = false
+  }
+})
 </script>
 
 <template>
