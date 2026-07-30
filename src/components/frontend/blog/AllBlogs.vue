@@ -1,51 +1,48 @@
 <script setup>
-import { ref,computed } from 'vue';
+import { ref,computed, watch, onMounted } from 'vue';
 import BlogSidebar from './BlogSidebar.vue';
 import BlogCard from './BlogCard.vue';
 import BlogPagination from './BlogPagination.vue';
+import api from '../../../axios.js';
 
 const POSTS_PER_PAGE = 3
 
-const allPosts = ref([
-  {
-    id: 1,
-    category: 'Fitness',
-    date: 'Jan 10, 2026',
-    author: 'Admin',
-    comments: 5,
-    title: 'The Ultimate Guide to Upper Body Strength',
-    excerpt: 'Developing a strong upper body is crucial not just for aesthetics but for overall functional fitness. In this comprehensive guide, we break down the essential compound movements...',
-    image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=2069&auto=format&fit=crop',
-  },
-  {
-    id: 2,
-    category: 'Nutrition',
-    date: 'Jan 05, 2026',
-    author: 'Sarah C.',
-    comments: 12,
-    title: 'Meal Prep 101: Fueling Your Gains',
-    excerpt: "Consistency in the kitchen is just as important as consistency in the gym. Learn how to prepare healthy, macro-friendly meals for the entire week in under two hours...",
-    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=2070&auto=format&fit=crop',
-  },
-  {
-    id: 3,
-    category: 'Lifestyle',
-    date: 'Dec 28, 2025',
-    author: 'Mike T.',
-    comments: 3,
-    title: 'The Importance of Sleep for Recovery',
-    excerpt: "You can train hard and eat right, but if you aren't sleeping enough, you're leaving gains on the table. Discover how sleep impacts muscle growth and hormone balance...",
-    image: 'https://images.unsplash.com/photo-1532036075302-4bd46fcb07af?q=80&w=1169&auto=format&fit=crop',
-  },
-])
-
+const allPosts = ref([])
 const currentPage = ref(1)
-const totalpages = computed(() => Math.ceil(allPosts.value.length/POSTS_PER_PAGE))
+const totalPages = ref(1)
 
-const paginatedPosts = computed(() => {
-    const start = (currentPage.value-1)*POSTS_PER_PAGE
-    return allPosts.value.slice(start, start+POSTS_PER_PAGE)
-}) 
+const fetchPosts = async () => {
+    try{
+        const response = await api.get(`/blogs?page=${currentPage.value}`);
+        const data = response.data.data;
+
+        allPosts.value = data.map(p =>({
+            id:p.id,
+            category:p.category,
+            date:new Date(p.published_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+            author:p.author?.name || 'Unknown',
+            comments:0,
+            title: p.title,
+            slug:p.slug,
+            exerpt:p.exerpt,
+            image:p.thumbnail_url || 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=2069&auto=format&fit=crop'
+        }));
+
+        totalPages.value = response.data.meta.last_page
+    }
+    catch(err)
+    {
+        console.error("Failed to fetch blogs", error);
+    }
+}
+
+watch(currentPage, () => {
+    fetchPosts();
+})
+
+onMounted(() => {
+    fetchPosts();
+})
 </script>
 
 <template>
